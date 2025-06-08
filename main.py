@@ -95,17 +95,20 @@ async def main():
     # Add handlers
     application.add_handler(CommandHandler('start', start))
     
-    # Set up periodic checks
-    job_queue = application.job_queue
-    job_queue.run_repeating(check_new_tokens, interval=60, first=10)
-    
     try:
+        # Initialize and start the application first
         await application.initialize()
         await application.start()
+        
+        # Now job_queue is ready — schedule your repeating job here
+        application.job_queue.run_repeating(check_new_tokens, interval=60, first=10)
+        
+        # Start polling and idle
         await application.updater.start_polling()
         await application.idle()
     except Exception as e:
         print(f"Error during bot startup: {e}")
+
 
 if __name__ == '__main__':
     asyncio.run(main())
